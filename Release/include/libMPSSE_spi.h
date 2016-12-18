@@ -162,7 +162,7 @@ FTDI_API FT_STATUS SPI_IsBusy(FT_HANDLE handle, bool *state);
 FTDI_API void Init_libMPSSE(void);
 FTDI_API void Cleanup_libMPSSE(void);
 FTDI_API FT_STATUS SPI_ChangeCS(FT_HANDLE handle, uint32 configOptions);
-FTDI_API FT_STATUS FT_WriteGPIO(FT_HANDLE handle, uint8 dir, uint8 value);
+FTDI_API FT_STATUS FT_WriteGPIO(FT_HANDLE handle, uint16 dir, uint16 value);
 FTDI_API FT_STATUS FT_ReadGPIO(FT_HANDLE handle,uint8 *value);
 FTDI_API FT_STATUS SPI_ToggleCS(FT_HANDLE handle, bool state);
 

@@ -1263,23 +1263,42 @@ FT_STATUS Mid_EmptyDeviceInputBuff(FT_HANDLE handle)
  * \note
  * \warning
  */
-FTDI_API FT_STATUS FT_WriteGPIO(FT_HANDLE handle, uint8 dir, uint8 value)
+FTDI_API FT_STATUS FT_WriteGPIO(FT_HANDLE handle, uint16 dir, uint16 value)
 {
 	FT_STATUS status;
-	uint8 buffer[3];
+	uint8 buffer[6];
 	DWORD bytesWritten = 0;
 	uint32 bufIdx = 0;
 
+    uint8 lowDir;
+    uint8 lowValue;
+    uint8 highDir;
+    uint8 highValue;
+
 	FN_ENTER;
-#if 1 //def FT800_232HM
-	buffer[bufIdx++] = MPSSE_CMD_SET_DATA_BITS_HIGHBYTE;
-	buffer[bufIdx++] = value;
-	buffer[bufIdx++] = dir;
-#else
-	buffer[bufIdx++] = MPSSE_CMD_SET_DATA_BITS_LOWBYTE;
-	buffer[bufIdx++] = value;
-	buffer[bufIdx++] = dir;
-#endif
+//#if 1 //def FT800_232HM
+//	buffer[bufIdx++] = MPSSE_CMD_SET_DATA_BITS_HIGHBYTE;
+//	buffer[bufIdx++] = value;
+//	buffer[bufIdx++] = dir;
+//#else
+//	buffer[bufIdx++] = MPSSE_CMD_SET_DATA_BITS_LOWBYTE;
+//	buffer[bufIdx++] = value;
+//	buffer[bufIdx++] = dir;
+//#endif
+
+    lowDir = dir & 0xFF;
+    lowValue = value & 0xFF;
+    highDir = (dir >> 8) & 0xFF;
+    highValue = (value >> 8) & 0xFF;
+
+    buffer[bufIdx++] = MPSSE_CMD_SET_DATA_BITS_HIGHBYTE;
+    buffer[bufIdx++] = highValue;
+    buffer[bufIdx++] = highDir;
+
+    buffer[bufIdx++] = MPSSE_CMD_SET_DATA_BITS_LOWBYTE;
+    buffer[bufIdx++] = lowValue;
+    buffer[bufIdx++] = lowDir;
+
 	status = varFunctionPtrLst.p_FT_Write(handle,buffer,bufIdx,&bytesWritten);
 	FN_EXIT;
 	return status;
