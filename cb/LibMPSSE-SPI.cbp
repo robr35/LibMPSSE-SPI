@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="LibMPSSE-SPI" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/LibMPSSE-SPI" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-DBUILD_DLL" />
+					<Add option="-g" />
+				</Compiler>
+				<Linker>
+					<Add library="user32" />
+				</Linker>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/LibMPSSE-SPI" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-DBUILD_DLL" />
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add library="user32" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add directory="../LibMPSSE/Build/Windows" />
+			<Add directory="../LibMPSSE/Common/inc" />
+			<Add directory="../LibMPSSE/Infra/inc" />
+			<Add directory="../LibMPSSE/MiddleLayer/inc" />
+			<Add directory="../LibMPSSE/TopLayer/SPI/inc" />
+			<Add directory="../External/Windows/CDMv2.10.00" />
+		</Compiler>
+		<Unit filename="../LibMPSSE/Common/inc/ftdi_common.h" />
+		<Unit filename="../LibMPSSE/Common/src/ftdi_common.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../LibMPSSE/Infra/inc/ftdi_infra.h" />
+		<Unit filename="../LibMPSSE/Infra/src/ftdi_infra.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../LibMPSSE/MiddleLayer/inc/ftdi_mid.h" />
+		<Unit filename="../LibMPSSE/MiddleLayer/src/ftdi_mid.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../LibMPSSE/TopLayer/SPI/inc/ftdi_spi.h" />
+		<Unit filename="../LibMPSSE/TopLayer/SPI/src/ftdi_spi.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
