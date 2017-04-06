@@ -1317,28 +1317,33 @@ FTDI_API FT_STATUS FT_WriteGPIO(FT_HANDLE handle, uint16 dir, uint16 value)
  * \note The directions of the GPIO pins have to be first set to input mode using FT_WriteGPIO
  * \warning
  */
-FTDI_API FT_STATUS FT_ReadGPIO(FT_HANDLE handle,uint8 *value)
+FTDI_API FT_STATUS FT_ReadGPIO(FT_HANDLE handle,uint16 *value)
 {
 	FT_STATUS status;
-	uint8 buffer[2];
+	uint8 buffer[4];
 	DWORD bytesTransfered = 0;
 	DWORD bytesToTransfer = 0;
 	UCHAR readBuffer[10];
 
 	FN_ENTER;
-#if 1 //def FT800_232HM
+//#if 1 //def FT800_232HM
+//	buffer[bytesToTransfer++] = MPSSE_CMD_GET_DATA_BITS_HIGHBYTE;
+//	buffer[bytesToTransfer++] = MPSSE_CMD_SEND_IMMEDIATE;
+//#else
+//	buffer[bytesToTransfer++] = MPSSE_CMD_GET_DATA_BITS_LOWBYTE;
+//	buffer[bytesToTransfer++] = MPSSE_CMD_SEND_IMMEDIATE;
+//#endif
 	buffer[bytesToTransfer++] = MPSSE_CMD_GET_DATA_BITS_HIGHBYTE;
 	buffer[bytesToTransfer++] = MPSSE_CMD_SEND_IMMEDIATE;
-#else
 	buffer[bytesToTransfer++] = MPSSE_CMD_GET_DATA_BITS_LOWBYTE;
 	buffer[bytesToTransfer++] = MPSSE_CMD_SEND_IMMEDIATE;
-#endif
+
 	status = varFunctionPtrLst.p_FT_Write(handle,buffer,bytesToTransfer,\
 		&bytesTransfered);
 	CHECK_STATUS(status);
 	DBG(MSG_DEBUG,"bytesToTransfer=0x%x bytesTransfered=0x%x\n",\
 		(unsigned)bytesToTransfer,(unsigned)bytesTransfered);
-	bytesToTransfer = 1;
+	bytesToTransfer = 2;
 	bytesTransfered = 0;
 	status = varFunctionPtrLst.p_FT_Read(handle,readBuffer,bytesToTransfer,\
 		&bytesTransfered);
@@ -1347,7 +1352,7 @@ FTDI_API FT_STATUS FT_ReadGPIO(FT_HANDLE handle,uint8 *value)
 		(unsigned)bytesToTransfer,(unsigned)bytesTransfered);
 	if(bytesToTransfer != bytesTransfered)
 		status = FT_IO_ERROR;
-	*value = readBuffer[0];
+	*value  = ((readBuffer[0] & 0xFF) << 8) | (readBuffer[1] & 0xFF);
 
 	FN_EXIT;
 	return status;

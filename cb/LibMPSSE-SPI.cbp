@@ -46,7 +46,8 @@
 			<Add directory="../LibMPSSE/Infra/inc" />
 			<Add directory="../LibMPSSE/MiddleLayer/inc" />
 			<Add directory="../LibMPSSE/TopLayer/SPI/inc" />
-			<Add directory="../External/Windows/CDMv2.10.00" />
+			<Add directory="../Release/include" />
+			<Add directory="../Release/include/windows" />
 		</Compiler>
 		<Unit filename="../LibMPSSE/Common/inc/ftdi_common.h" />
 		<Unit filename="../LibMPSSE/Common/src/ftdi_common.c">
@@ -64,6 +65,8 @@
 		<Unit filename="../LibMPSSE/TopLayer/SPI/src/ftdi_spi.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../Release/include/libMPSSE_spi.h" />
+		<Unit filename="../Release/include/windows/ftd2xx.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />
