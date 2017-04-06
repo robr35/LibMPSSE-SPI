@@ -57,12 +57,11 @@ kernel & user mode
 
 
 typedef PVOID	FT_HANDLE;
-typedef ULONG	FT_STATUS;
 
 //
 // Device status
 //
-enum {
+typedef enum FT_STATUS {
 	FT_OK,
 	FT_INVALID_HANDLE,
 	FT_DEVICE_NOT_FOUND,
@@ -84,7 +83,7 @@ enum {
 	FT_NOT_SUPPORTED,
 	FT_OTHER_ERROR,
 	FT_DEVICE_LIST_NOT_READY,
-};
+} FT_STATUS;
 
 
 #define FT_SUCCESS(status) ((status) == FT_OK)
