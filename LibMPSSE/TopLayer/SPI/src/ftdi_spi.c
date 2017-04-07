@@ -197,7 +197,7 @@ FTDI_API FT_STATUS SPI_OpenChannel(uint32 index, FT_HANDLE *handle)
 FTDI_API FT_STATUS SPI_InitChannel(FT_HANDLE handle, ChannelConfig *config)
 {
 	FT_STATUS status;
-	uint8 buffer[5];
+	uint8 buffer[6];
 	uint32 noOfBytes=0;
 	uint32 noOfBytesTransferred;
 	uint8 mode;
@@ -209,13 +209,13 @@ FTDI_API FT_STATUS SPI_InitChannel(FT_HANDLE handle, ChannelConfig *config)
 	/*This is to ensure that the library puts the lines to correct directions
 	even if wrong values are passed by the user */
 	/* Set initial direction of line SCLK  as OUT */
-	config->Pin |= 0x00000001;/*Note: Direction is out if bit is 1!!! */
+	config->initialPinDir |= 0x0001;/*Note: Direction is out if bit is 1!!! */
 	/* Set initial direction of  MOSI line as OUT */
-	config->Pin |= 0x00000002;
+	config->initialPinDir |= 0x0002;
 	/* Set initial direction of MISO line as IN */
-	config->Pin &= 0xFFFFFFFB;
+	config->initialPinDir &= 0xFFFB;
 	/* Set initial direction of CS line as OUT */
-	config->Pin |= \
+	config->initialPinDir |= \
 		((1<<((config->configOptions & SPI_CONFIG_OPTION_CS_MASK)>>2))<<3);
 
 	/*Set initial state of clock line*/
@@ -225,13 +225,13 @@ FTDI_API FT_STATUS SPI_InitChannel(FT_HANDLE handle, ChannelConfig *config)
 		case 0:
 		case 1:
 			/* clock idle low */
-			config->Pin &= 0xFFFFFEFF;
+			config->initialPinState &= 0xFFFE;
 			break;
 
 		case 2:
 		case 3:
 			/* clock idle high */
-			config->Pin |= 0x00000100;
+			config->initialPinState |= 0x0001;
 			break;
 		default:
 			DBG(MSG_DEBUG,"invalid mode(%u)\n",(unsigned)mode);
@@ -239,7 +239,8 @@ FTDI_API FT_STATUS SPI_InitChannel(FT_HANDLE handle, ChannelConfig *config)
 
 
 	/* Copy initial state values to present state variable */
-	config->currentPinState = (uint16)config->Pin;
+	config->currentPinState = (uint16)config->initialPinState;
+	config->currentPinDir   = (uint16)config->initialPinDir;
 
 	DBG(MSG_DEBUG,"handle=0x%x ClockRate=%u LatencyTimer=%u Options=0x%x\n",\
 		(unsigned)handle,(unsigned)config->ClockRate,	\
@@ -251,9 +252,12 @@ FTDI_API FT_STATUS SPI_InitChannel(FT_HANDLE handle, ChannelConfig *config)
 	if(FT_OK == status)
 	{
 		/* Set the directions and values to the lines */
-		buffer[noOfBytes++] = MPSSE_CMD_SET_DATA_BITS_LOWBYTE;/*MPSSE command*/
+		buffer[noOfBytes++] = MPSSE_CMD_SET_DATA_BITS_HIGHBYTE;
 		buffer[noOfBytes++] = (uint8)((config->currentPinState & 0xFF00)>>8);
-		buffer[noOfBytes++] = (uint8)(config->currentPinState & 0x00FF); /*Dir*/
+		buffer[noOfBytes++] = (uint8)((config->currentPinDir & 0xFF00)>>8); /*Dir*/
+		buffer[noOfBytes++] = MPSSE_CMD_SET_DATA_BITS_LOWBYTE;/*MPSSE command*/
+		buffer[noOfBytes++] = (uint8)(config->currentPinState & 0x00FF);
+		buffer[noOfBytes++] = (uint8)(config->currentPinDir & 0x00FF); /*Dir*/
 		status = FT_Channel_Write(SPI,handle,noOfBytes,buffer,\
 			&noOfBytesTransferred);
 		CHECK_STATUS(status);
@@ -285,8 +289,7 @@ FTDI_API FT_STATUS SPI_CloseChannel(FT_HANDLE handle)
 {
 	FT_STATUS status;
 	ChannelConfig *config=NULL;
-	uint8 dir,val;
-	uint8 buffer[5];
+	uint8 buffer[6];
 	uint32 noOfBytes=0;
 	uint32 noOfBytesTransferred;
 	FN_ENTER;
@@ -296,13 +299,14 @@ FTDI_API FT_STATUS SPI_CloseChannel(FT_HANDLE handle)
 	/* Retrieve final state values for the lines */
 	status = SPI_GetChannelConfig(handle,&config);
 	CHECK_STATUS(status);
-	dir = (uint8)((config->Pin & 0x00FF0000)>>16);
-	val = (config->Pin & 0xFF000000)>>24;
 
 	/* Set lines to final state */
+	buffer[noOfBytes++] = MPSSE_CMD_SET_DATA_BITS_HIGHBYTE;/* MPSSE command */
+	buffer[noOfBytes++] = ((config->finalPinState & 0xFF00)>>8); /*Value*/
+	buffer[noOfBytes++] = ((uint8)(config->finalPinDir & 0xFF00)>>8); /*Direction*/
 	buffer[noOfBytes++] = MPSSE_CMD_SET_DATA_BITS_LOWBYTE;/* MPSSE command */
-	buffer[noOfBytes++] = val; /*Value*/
-	buffer[noOfBytes++] = dir; /*Direction*/
+	buffer[noOfBytes++] = (config->finalPinState & 0x00FF); /*Value*/
+	buffer[noOfBytes++] = (uint8)(config->finalPinDir & 0x00FF); /*Direction*/
 	status = FT_Channel_Write(SPI,handle,noOfBytes,buffer,\
 		&noOfBytesTransferred);
 	CHECK_STATUS(status);
@@ -853,21 +857,21 @@ FTDI_API FT_STATUS SPI_ChangeCS(FT_HANDLE handle, uint32 configOptions)
 		case 0:
 		case 1:
 			/* clock idle low */
-			config->currentPinState &= 0xFEFF;
+			config->currentPinState &= 0xFFFE;
 			break;
 
 		case 2:
 		case 3:
 			/* clock idle high */
-			config->currentPinState |= 0x0100;
+			config->currentPinState |= 0x0001;
 			break;
 		default:
 			DBG(MSG_DEBUG,"invalid mode(%u)\n",(unsigned)mode);
 	}
 
 	buffer[noOfBytes++] = MPSSE_CMD_SET_DATA_BITS_LOWBYTE;/* MPSSE command */
-	buffer[noOfBytes++] = (uint8)((config->currentPinState & 0xFF00)>>8);/*Val*/
-	buffer[noOfBytes++] = (uint8)(config->currentPinState & 0x00FF); /*Dir*/
+	buffer[noOfBytes++] = (uint8)(config->currentPinState & 0x00FF);/*Val*/
+	buffer[noOfBytes++] = (uint8)(config->currentPinDir & 0x00FF); /*Dir*/
 
 	status = FT_Channel_Write(SPI,handle,noOfBytes,buffer,\
 			&noOfBytesTransferred);
@@ -1179,7 +1183,7 @@ FT_STATUS SPI_ToggleCS(FT_HANDLE handle, bool state)
 	uint8 buffer[5];
 	uint32 i=0;
 	uint32 noOfBytesTransferred;
-	uint8 value, oldValue, direction;
+	uint16 value, oldValue, direction;
 
 	FN_ENTER;
 	if(!state)
@@ -1214,14 +1218,14 @@ FT_STATUS SPI_ToggleCS(FT_HANDLE handle, bool state)
 		(unsigned)config->configOptions,(unsigned)activeLow);
 
 	//direction = (uint8)config->currentPinState;/*get current state*/
-	direction = (uint8)(config->currentPinState & 0x00FF);//20110718
+	direction = config->currentPinDir;
 	direction |= \
 		((1<<((config->configOptions & SPI_CONFIG_OPTION_CS_MASK)>>2))<<3);
 	DBG(MSG_DEBUG,"config->currentPinState=0x%x direction=0x%x\n",
 		(unsigned)config->currentPinState,(unsigned)direction);
 
 	//oldValue = (uint8)(8>>config->currentPinState);
-	oldValue =  (uint8)((config->currentPinState & 0xFF00)>>8);//20110718
+	oldValue = config->currentPinState;
 	value = ((1<<((config->configOptions & SPI_CONFIG_OPTION_CS_MASK)>>2))<<3);
 
 	DBG(MSG_DEBUG,"oldValue=0x%x value=0x%x\n",oldValue,value);
@@ -1231,7 +1235,9 @@ FT_STATUS SPI_ToggleCS(FT_HANDLE handle, bool state)
 	if((TRUE==state && TRUE==activeLow) || (FALSE==state && FALSE==activeLow))
 		value = oldValue & ~value;/* set the CS line low */
 
-	config->currentPinState = ((uint16)value<<8) | direction;/*save  dirn & value*/
+	//save  dirn & value
+	config->currentPinState = value;
+	config->currentPinDir = direction;
 	DBG(MSG_DEBUG,"config->currentPinState=0x%x\n",
 		(unsigned)config->currentPinState);
 

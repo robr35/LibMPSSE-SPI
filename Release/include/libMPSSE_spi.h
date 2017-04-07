@@ -126,10 +126,16 @@ typedef struct ChannelConfig_t
 	BIT6 -BIT31		: Reserved
 	*/
 
-	uint32		Pin;/*BIT7   -BIT0:   Initial direction of the pins	*/
-					/*BIT15 -BIT8:   Initial values of the pins		*/
-					/*BIT23 -BIT16: Final direction of the pins		*/
-					/*BIT31 -BIT24: Final values of the pins		*/
+//	uint32		Pin;/* BIT7   -BIT0:   Initial direction of the pins	*/
+//					/* BIT15 -BIT8:   Initial values of the pins		*/
+//					/* BIT23 -BIT16: Final direction of the pins		*/
+//					/* BIT31 -BIT24: Final values of the pins		*/
+    uint16      initialPinState;/* BIT15 - BIT0:    Initial values of the pins  */
+    uint16      initialPinDir;  /* BIT15 - BIT0:    Initial dir of the pins     */
+    uint16      finalPinState;  /* BIT15 - BIT0:    Final values of the pins    */
+    uint16      finalPinDir;    /* BIT15 - BIT0:    Final dir of the pins       */
+    uint16      currentPinState;/* BIT15 - BIT0:    Current values of the pins  */
+    uint16      currentPinDir;  /* BIT15 - BIT0:    Current dir of the pins     */
 	uint16		reserved;
 }ChannelConfig;
 
