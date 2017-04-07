@@ -246,8 +246,7 @@ FTDI_API FT_STATUS SPI_InitChannel(FT_HANDLE handle, ChannelConfig *config)
 		(unsigned)config->LatencyTimer,(unsigned)config->configOptions);
 
 	status = FT_InitChannel(SPI,handle,(uint32)config->ClockRate,	\
-		(uint32)config->LatencyTimer,(uint32)config->configOptions,
-		(uint32)config->Pin);
+		(uint32)config->LatencyTimer,(uint32)config->configOptions);
 	CHECK_STATUS(status);
 	if(FT_OK == status)
 	{
