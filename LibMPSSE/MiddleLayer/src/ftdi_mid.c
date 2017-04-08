@@ -1334,7 +1334,6 @@ FTDI_API FT_STATUS FT_ReadGPIO(FT_HANDLE handle,uint16 *value)
 //	buffer[bytesToTransfer++] = MPSSE_CMD_SEND_IMMEDIATE;
 //#endif
 	buffer[bytesToTransfer++] = MPSSE_CMD_GET_DATA_BITS_HIGHBYTE;
-	buffer[bytesToTransfer++] = MPSSE_CMD_SEND_IMMEDIATE;
 	buffer[bytesToTransfer++] = MPSSE_CMD_GET_DATA_BITS_LOWBYTE;
 	buffer[bytesToTransfer++] = MPSSE_CMD_SEND_IMMEDIATE;
 
