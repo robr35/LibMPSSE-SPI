@@ -951,10 +951,10 @@ extern "C" {
 	//
 
 	typedef struct _ft_device_list_info_node {
-		ULONG Flags;
-		ULONG Type;
-		ULONG ID;
-		DWORD LocId;
+		unsigned long Flags;
+		unsigned long Type;
+		unsigned long ID;
+		unsigned long LocId;
 		char SerialNumber[16];
 		char Description[64];
 		FT_HANDLE ftHandle;
