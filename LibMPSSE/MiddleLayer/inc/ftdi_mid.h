@@ -114,8 +114,8 @@ extern FT_STATUS Mid_GetFtDeviceType(FT_HANDLE handle,FT_DEVICE *ftDevice);
 extern FT_STATUS Mid_SetDeviceLoopbackState(FT_HANDLE handle,uint8 \
 	loopBackFlag);
 extern FT_STATUS Mid_EmptyDeviceInputBuff(FT_HANDLE handle);
-FTDI_API FT_STATUS FT_WriteGPIO(FT_HANDLE handle, uint16 dir, uint16 value);
-FTDI_API FT_STATUS FT_ReadGPIO(FT_HANDLE handle,uint16 *value);
+FT_STATUS FT_WriteGPIO(FT_HANDLE handle, uint16 dir, uint16 value);
+FT_STATUS FT_ReadGPIO(FT_HANDLE handle,uint16 *value);
 extern FT_STATUS Mid_GetQueueStatus(FT_HANDLE handle, LPDWORD lpdwAmountInRxQueue);
 
 #endif /* FTDI_MID_H */

@@ -1263,7 +1263,7 @@ FT_STATUS Mid_EmptyDeviceInputBuff(FT_HANDLE handle)
  * \note
  * \warning
  */
-FTDI_API FT_STATUS FT_WriteGPIO(FT_HANDLE handle, uint16 dir, uint16 value)
+FT_STATUS FT_WriteGPIO(FT_HANDLE handle, uint16 dir, uint16 value)
 {
 	FT_STATUS status;
 	uint8 buffer[6];
@@ -1317,7 +1317,7 @@ FTDI_API FT_STATUS FT_WriteGPIO(FT_HANDLE handle, uint16 dir, uint16 value)
  * \note The directions of the GPIO pins have to be first set to input mode using FT_WriteGPIO
  * \warning
  */
-FTDI_API FT_STATUS FT_ReadGPIO(FT_HANDLE handle,uint16 *value)
+FT_STATUS FT_ReadGPIO(FT_HANDLE handle,uint16 *value)
 {
 	FT_STATUS status;
 	uint8 buffer[4];
