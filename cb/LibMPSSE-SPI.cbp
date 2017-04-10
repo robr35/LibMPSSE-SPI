@@ -49,6 +49,7 @@
 			<Add directory="../Release/include" />
 			<Add directory="../Release/include/windows" />
 		</Compiler>
+		<Unit filename="../LibMPSSE/Build/Windows/Makefile" />
 		<Unit filename="../LibMPSSE/Common/inc/ftdi_common.h" />
 		<Unit filename="../LibMPSSE/Common/src/ftdi_common.c">
 			<Option compilerVar="CC" />
