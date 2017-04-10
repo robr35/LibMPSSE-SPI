@@ -884,6 +884,79 @@ FTDI_API FT_STATUS SPI_ChangeCS(FT_HANDLE handle, uint32 configOptions)
 	return status;
 }
 
+/*!
+ * \brief Writes to the available GPIO lines
+ *
+ * Writes to the GPIO lines not associated with the SPI pins of the MPSSE channel
+ *
+ * \param[in] handle Handle of the channel
+ * \param[in] dir The direction of the lines. 0 for in and 1 for out
+ * \param[in] value Output state of the GPIO lines
+ * \return status
+ * \sa
+ * \note
+ * \warning
+ */
+FTDI_API FT_STATUS SPI_WriteGPIO(FT_HANDLE handle, uint16 dir, uint16 value)
+{
+	FT_STATUS status=FT_OTHER_ERROR;
+	ChannelConfig *config=NULL;
+	uint16 currentValue;
+
+	FN_ENTER;
+#ifdef ENABLE_PARAMETER_CHECKING
+	CHECK_NULL_RET(handle);
+#endif
+
+	status = SPI_GetChannelConfig(handle, &config);
+	CHECK_STATUS(status);
+
+	// Dir should always be output for SCLK, MOSI and CS, input for MISO.
+	dir |= (1 << 0) | (1 << 1) | ((1<<((config->configOptions & SPI_CONFIG_OPTION_CS_MASK)>>2))<<3);
+	dir &= ~(1 << 2);
+
+	// Value should not modify SPI pins and CS.
+	status = FT_ReadGPIO(handle, &currentValue);
+	CHECK_STATUS(status);
+
+	value &= (0x07 | ((1<<((config->configOptions & SPI_CONFIG_OPTION_CS_MASK)>>2))<<3)); // Clear SPI pins in new value.
+	value |= (currentValue & 0x07) | (currentValue & ((1<<((config->configOptions & SPI_CONFIG_OPTION_CS_MASK)>>2))<<3)); // OR in any high SPI pins to new value.
+
+	status = FT_WriteGPIO(handle, dir, value);
+	CHECK_STATUS(status);
+
+	FN_EXIT;
+	return status;
+}
+
+/*!
+ * \brief Reads from the 16 GPIO lines
+ *
+ * This function reads the GPIO lines of the MPSSE channel
+ *
+ * \param[in] handle Handle of the channel
+ * \param[out] *value Input state of the 16 GPIO lines(1=high)
+ * \return status
+ * \sa
+ * \note The directions of the GPIO pins have to be first set to input mode using FT_WriteGPIO
+ * \warning
+ */
+FTDI_API FT_STATUS SPI_ReadGPIO(FT_HANDLE handle,uint16 *value)
+{
+	FT_STATUS status=FT_OTHER_ERROR;
+
+	FN_ENTER;
+#ifdef ENABLE_PARAMETER_CHECKING
+	CHECK_NULL_RET(handle);
+	CHECK_NULL_RET(value);
+#endif
+	status = FT_ReadGPIO(handle, value);
+	CHECK_STATUS(status);
+
+	FN_EXIT;
+	return status;
+}
+
 /******************************************************************************/
 /*						Local function definations						  */
 /******************************************************************************/
