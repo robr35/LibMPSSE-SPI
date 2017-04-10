@@ -355,7 +355,7 @@ FT_STATUS FT_InitChannel(FT_LegacyProtocol Protocol, FT_HANDLE handle,...)
 				return FT_INVALID_PARAMETER;
 
 	/*Get the device type*/
-	status = Mid_GetFtDeviceType(handle, &ftDevice);
+	status = FT_GetFtDeviceType(handle, &ftDevice);
 	CHECK_STATUS(status);
 	/*reset the device*/
 	status = Mid_ResetDevice(handle);
@@ -400,7 +400,7 @@ FT_STATUS FT_InitChannel(FT_LegacyProtocol Protocol, FT_HANDLE handle,...)
 	/*wait for USB*/
 	INFRA_SLEEP(50);
 	/*set Clock frequency*/
-	status = Mid_SetClock(handle, ftDevice, clockRate);
+	status = FT_SetClock(handle, ftDevice, clockRate);
 	CHECK_STATUS(status);
 	DBG(MSG_INFO, "Mid_SetClock Status Ok return 0x%x\n",(unsigned)status);
 	INFRA_SLEEP(20);
@@ -1043,7 +1043,7 @@ FT_STATUS Mid_SetGPIOLow(FT_HANDLE handle, uint8 value, uint8 direction)
 
 }
 
-FT_STATUS Mid_GetFtDeviceType(FT_HANDLE handle, FT_DEVICE *ftDevice)
+FT_STATUS FT_GetFtDeviceType(FT_HANDLE handle, FT_DEVICE *ftDevice)
 {
 	FT_STATUS status = FT_OTHER_ERROR;
 	DWORD deviceID;
@@ -1106,7 +1106,7 @@ FT_STATUS Mid_GetFtDeviceType(FT_HANDLE handle, FT_DEVICE *ftDevice)
  * \note
  * \warning
  */
-FT_STATUS Mid_SetClock(FT_HANDLE handle, FT_DEVICE ftDevice, uint32 clock)
+FT_STATUS FT_SetClock(FT_HANDLE handle, FT_DEVICE ftDevice, uint32 clock)
 {
 	UCHAR inputBuffer[10];
 	DWORD bytesWritten = 0;

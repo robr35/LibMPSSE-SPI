@@ -87,6 +87,8 @@ FT_STATUS FT_Channel_Read(FT_LegacyProtocol Protocol, FT_HANDLE handle,
 				uint32 noOfBytes, uint8* buffer, uint32 *noOfBytesTransferred);
 FT_STATUS FT_Channel_Write(FT_LegacyProtocol Protocol, FT_HANDLE handle,
 			uint32 noOfBytes, uint8* buffer, uint32 *noOfBytesTransferred);
+FT_STATUS FT_GetFtDeviceType(FT_HANDLE handle,FT_DEVICE *ftDevice);
+FT_STATUS FT_SetClock(FT_HANDLE handle, FT_DEVICE ftDevice, uint32 clock);
 extern bool Mid_CheckMPSSEAvailable(FT_DEVICE_LIST_INFO_NODE);
 
 extern FT_STATUS Mid_ResetDevice(FT_HANDLE handle);
@@ -108,9 +110,6 @@ extern FT_STATUS Mid_SendReceiveCmdFromMPSSE(FT_HANDLE handle,UCHAR\
 	echoCmdFlag,UCHAR ecoCmd,UCHAR *cmdEchoed);
 extern FT_STATUS Mid_SetGPIOLow(FT_HANDLE handle, uint8 value, uint8 \
 	direction);
-extern FT_STATUS Mid_SetClock(FT_HANDLE handle, FT_DEVICE ftDevice, uint32 \
-	clock);
-extern FT_STATUS Mid_GetFtDeviceType(FT_HANDLE handle,FT_DEVICE *ftDevice);
 extern FT_STATUS Mid_SetDeviceLoopbackState(FT_HANDLE handle,uint8 \
 	loopBackFlag);
 extern FT_STATUS Mid_EmptyDeviceInputBuff(FT_HANDLE handle);

@@ -962,6 +962,79 @@ FTDI_API FT_STATUS SPI_ReadGPIO(FT_HANDLE handle,uint16 *value)
 	return status;
 }
 
+/*!
+ * \brief Sets the SPI clock rate.
+ *
+ * This function sets the SPI clock rate of the MPSSE channel
+ *
+ * \param[in] handle Handle of the channel
+ * \param[in] clock SPI clock rate to set for this channel
+ * \return status
+ * \sa
+ * \note
+ * \warning
+ */
+FTDI_API FT_STATUS SPI_SetClock(FT_HANDLE handle, uint32 clock)
+{
+	FT_STATUS status=FT_OTHER_ERROR;
+	FT_DEVICE device;
+
+	FN_ENTER;
+#ifdef ENABLE_PARAMETER_CHECKING
+	CHECK_NULL_RET(handle);
+#endif
+	status = FT_GetFtDeviceType(handle, &device);
+	CHECK_STATUS(status);
+
+	status = FT_SetClock(handle, device, clock);
+	CHECK_STATUS(status);
+
+	FN_EXIT;
+	return status;
+}
+
+/*!
+ * \brief Sets the SPI mode.
+ *
+ * This function sets the SPI mode of the MPSSE channel
+ *
+ * \param[in] handle Handle of the channel
+ * \param[in] mode SPI mode to set for this channel
+ * \return status
+ * \sa
+ * \note
+ * \warning
+ */
+FTDI_API FT_STATUS SPI_SetMode(FT_HANDLE handle, uint8 mode)
+{
+	FT_STATUS status=FT_OTHER_ERROR;
+	ChannelConfig *config=NULL;
+
+	FN_ENTER;
+#ifdef ENABLE_PARAMETER_CHECKING
+	CHECK_NULL_RET(handle);
+#endif
+	// Check mode is valid.
+	if (SPI_CONFIG_OPTION_MODE3 < mode)
+	{
+		return FT_INVALID_PARAMETER;
+	}
+
+	status = SPI_GetChannelConfig(handle, &config);
+	CHECK_STATUS(status);
+
+	if (NULL == config)
+	{
+		return FT_OTHER_ERROR;
+	}
+
+	config->configOptions |= mode & SPI_CONFIG_OPTION_MODE_MASK;
+	CHECK_STATUS(status);
+
+	FN_EXIT;
+	return status;
+}
+
 /******************************************************************************/
 /*						Local function definations						  */
 /******************************************************************************/
