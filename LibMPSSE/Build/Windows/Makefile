@@ -7,7 +7,7 @@ MIDDLE_INC_DIR = ../../MiddleLayer/inc
 #I2C_INC_DIR = ../../TopLayer/I2C/inc
 SPI_INC_DIR = ../../TopLayer/SPI/inc
 
-#ALL_INC_DIR = -I$(EXTERNAL_INC_DIR) -I$(INFRA_INC_DIR) -I$(COMMON_INC_DIR) -I$(MIDDLE_INC_DIR) -I$(I2C_INC_DIR) 
+#ALL_INC_DIR = -I$(EXTERNAL_INC_DIR) -I$(INFRA_INC_DIR) -I$(COMMON_INC_DIR) -I$(MIDDLE_INC_DIR) -I$(I2C_INC_DIR)
 ALL_INC_DIR = -I$(EXTERNAL_INC_DIR) -I$(INFRA_INC_DIR) -I$(COMMON_INC_DIR) -I$(MIDDLE_INC_DIR) -I$(SPI_INC_DIR)
 
 
@@ -17,12 +17,12 @@ MIDDLE_SRC_DIR = ../../MiddleLayer/src
 #I2C_SRC_DIR = ../../TopLayer/I2C/src
 SPI_SRC_DIR = ../../TopLayer/SPI/src
 
-#ALL_SRC_DIR = -I$(INFRA_SRC_DIR) -I$(COMMON_SRC_DIR) -I$(MIDDLE_SRC_DIR) -I$(I2C_SRC_DIR) 
+#ALL_SRC_DIR = -I$(INFRA_SRC_DIR) -I$(COMMON_SRC_DIR) -I$(MIDDLE_SRC_DIR) -I$(I2C_SRC_DIR)
 ALL_SRC_DIR = -I$(INFRA_SRC_DIR) -I$(COMMON_SRC_DIR) -I$(MIDDLE_SRC_DIR) -I$(SPI_SRC_DIR)
 
 #Put macros here
 #MACROS = -DINFRA_DEBUG_ENABLE
-MACROS = 
+MACROS =
 
 CC=gcc
 AR=ar
@@ -44,17 +44,17 @@ OBJECTS= ftdi_infra.o ftdi_mid.o ftdi_spi.o
 LIBS = -L /MinGW/lib
 
 # --- targets
-all:    libMPSSE
+all:    clean libMPSSE copy
 libMPSSE:   $(OBJECTS)
 		$(CC)  -o libMPSSE.dll -shared $(OBJECTS) $(LIBS) -Wl,--output-def,libMPSSE.def
 		$(AR) -rcs libMPSSE.a $(OBJECTS)
 
 ftdi_infra.o: $(INFRA_INC_DIR)
 		$(CC) $(CFLAGS) -c $(INFRA_SRC_DIR)/ftdi_infra.c
-		
+
 ftdi_mid.o: $(MIDDLE_INC_DIR)
 		$(CC) $(CFLAGS) -c $(MIDDLE_SRC_DIR)/ftdi_mid.c
-		
+
 #ftdi_i2c.o: $(I2C_INC_DIR)
 #		$(CC) $(CFLAGS) -c $(I2C_SRC_DIR)/ftdi_i2c.c
 
@@ -69,4 +69,5 @@ clean :
 	del *.i *.o *.exe *.bak *.txt *.dll *.lib *.a *.def *.exp
 #	rm tst.o serial.o tst.exe
 
-
+copy :
+	copy libMPSSE.dll ..\..\..\..\
