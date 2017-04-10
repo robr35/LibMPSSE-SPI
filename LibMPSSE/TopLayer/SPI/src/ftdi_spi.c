@@ -911,6 +911,11 @@ FTDI_API FT_STATUS SPI_WriteGPIO(FT_HANDLE handle, uint16 dir, uint16 value)
 	status = SPI_GetChannelConfig(handle, &config);
 	CHECK_STATUS(status);
 
+	if (NULL == config)
+	{
+		return FT_OTHER_ERROR;
+	}
+
 	// Dir should always be output for SCLK, MOSI and CS, input for MISO.
 	dir |= (1 << 0) | (1 << 1) | ((1<<((config->configOptions & SPI_CONFIG_OPTION_CS_MASK)>>2))<<3);
 	dir &= ~(1 << 2);
