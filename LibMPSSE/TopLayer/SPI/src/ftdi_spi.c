@@ -924,7 +924,7 @@ FTDI_API FT_STATUS SPI_WriteGPIO(FT_HANDLE handle, uint16 dir, uint16 value)
 	status = FT_ReadGPIO(handle, &currentValue);
 	CHECK_STATUS(status);
 
-	value &= (0x07 | ((1<<((config->configOptions & SPI_CONFIG_OPTION_CS_MASK)>>2))<<3)); // Clear SPI pins in new value.
+	value &= ~(0x07 | ((1<<((config->configOptions & SPI_CONFIG_OPTION_CS_MASK)>>2))<<3)); // Clear SPI pins in new value.
 	value |= (currentValue & 0x07) | (currentValue & ((1<<((config->configOptions & SPI_CONFIG_OPTION_CS_MASK)>>2))<<3)); // OR in any high SPI pins to new value.
 
 	status = FT_WriteGPIO(handle, dir, value);
