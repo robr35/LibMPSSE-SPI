@@ -237,6 +237,15 @@ FTDI_API FT_STATUS SPI_InitChannel(FT_HANDLE handle, ChannelConfig *config)
 			DBG(MSG_DEBUG,"invalid mode(%u)\n",(unsigned)mode);
 	}
 
+	/*Set initial state of CS line*/
+	if (config->configOptions & SPI_CONFIG_OPTION_CS_ACTIVELOW)
+	{
+		config->initialPinState |= ((1<<((config->configOptions & SPI_CONFIG_OPTION_CS_MASK)>>2))<<3);
+	}
+	else
+	{
+		config->initialPinState &= ~((1<<((config->configOptions & SPI_CONFIG_OPTION_CS_MASK)>>2))<<3);
+	}
 
 	/* Copy initial state values to present state variable */
 	config->currentPinState = (uint16)config->initialPinState;
@@ -921,7 +930,7 @@ FTDI_API FT_STATUS SPI_WriteGPIO(FT_HANDLE handle, uint16 dir, uint16 value)
 	dir &= ~(1 << 2);
 
 	// Value should not modify SPI pins and CS.
-	status = FT_ReadGPIO(handle, &currentValue);
+	currentValue = config->currentPinState;
 	CHECK_STATUS(status);
 
 	value &= ~(0x07 | ((1<<((config->configOptions & SPI_CONFIG_OPTION_CS_MASK)>>2))<<3)); // Clear SPI pins in new value.
@@ -929,6 +938,10 @@ FTDI_API FT_STATUS SPI_WriteGPIO(FT_HANDLE handle, uint16 dir, uint16 value)
 
 	status = FT_WriteGPIO(handle, dir, value);
 	CHECK_STATUS(status);
+
+	// Save value of pins into config so it does not get overriden by other functions.
+	config->currentPinState = value;
+	config->currentPinDir = dir;
 
 	FN_EXIT;
 	return status;
@@ -1028,7 +1041,30 @@ FTDI_API FT_STATUS SPI_SetMode(FT_HANDLE handle, uint8 mode)
 		return FT_OTHER_ERROR;
 	}
 
+	config->configOptions &= ~(SPI_CONFIG_OPTION_MODE_MASK);
 	config->configOptions |= mode & SPI_CONFIG_OPTION_MODE_MASK;
+
+	/*Set initial state of clock line*/
+	switch(mode)
+	{
+		case 0:
+		case 1:
+			/* clock idle low */
+			config->initialPinState &= 0xFFFE;
+			config->currentPinState &= 0xFFFE;
+			break;
+
+		case 2:
+		case 3:
+			/* clock idle high */
+			config->initialPinState |= 0x0001;
+			config->currentPinState |= 0x0001;
+			break;
+		default:
+			DBG(MSG_DEBUG,"invalid mode(%u)\n",(unsigned)mode);
+	}
+
+	status = FT_WriteGPIO(handle, config->currentPinDir, config->currentPinState);
 	CHECK_STATUS(status);
 
 	FN_EXIT;
